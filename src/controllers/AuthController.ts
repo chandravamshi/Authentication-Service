@@ -23,6 +23,7 @@ import { UserService } from "../services/UserService";
 export class AuthController {
   constructor(private userService: UserService) {}
 
+  /** 
   @Get("/validate-auth")
   @UseBefore(AuthMiddleware)
   async authTest(@Res() response: any) {
@@ -35,6 +36,7 @@ export class AuthController {
       throw error;
     }
   }
+  */
 
   @Get("/renew-tokens")
   @UseBefore(RenewRefreshTokenMiddleware)
