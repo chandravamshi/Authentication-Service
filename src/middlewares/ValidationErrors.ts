@@ -17,7 +17,9 @@ export class ValidationErrors implements ExpressErrorMiddlewareInterface {
       responseObject.message = error.message
         ? error.message
         : "You have an error in your request's body. Check 'errors' field for more details!";
-      //responseObject.cm = error.message
+      //
+
+      //responseObject.cm = new Error(error.message)
       //responseObject.status = 0;
       //responseObject.data = {};
       //responseObject.data.message = [];
@@ -26,7 +28,11 @@ export class ValidationErrors implements ExpressErrorMiddlewareInterface {
       //         responseObject.data.message.push(`property ${element.constraints[type]}`);
       //     });
       // });
+      if(error.httpCode){
+        res.status(error.httpCode)
+      }
 
+      //throw(new Error(error.message));
       res.send(responseObject);
     }
   }
