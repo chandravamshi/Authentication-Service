@@ -18,26 +18,45 @@ export class AuthMiddleware implements ExpressMiddlewareInterface {
   constructor(private userService: UserService) {}
 
   async use(req: any, res: any, next: (err?: any) => any): Promise<any> {
-    console.log("do something...");
+    console.log(
+      "inside authentication middelware in authentication micro serice"
+    );
     try {
+      console.log(req.headers);
       const token = req.headers["authorization"];
-      const deviceId = req.headers["deviceId"];
+      const deviceId = req.headers["deviceid"];
       console.log(token);
       console.log(deviceId);
 
       if (!token) {
-        res.send("A token is required for authentication");
+        res.status(401).send(
+          JSON.stringify({
+            status: "failed",
+            data: "A token is required",
+          })
+        );
       }
-      /** 
       if (!deviceId) {
-        res.send("Device Id is required for authentication");
-      }**/
+        res.status(401).send(
+          JSON.stringify({
+            status: "failed",
+            data: "Device id  is required",
+          })
+        );
+      }
 
       try {
-        const decoded = jwt.verify(token, "secret");
-        console.log('abcd');
+        const decoded = jwt.verify(token, String(process.env.TOKEN_KEY));
+        console.log("abcd");
         console.log(decoded);
         req.user = decoded;
+        //next();
+        res.status(200).send(
+          JSON.stringify({
+            status: "success",
+            data: "User Logged In",
+          })
+        );
         /** 
         if (decoded) {
           try {
@@ -55,31 +74,23 @@ export class AuthMiddleware implements ExpressMiddlewareInterface {
         }**/
       } catch (err) {
         if (err instanceof TokenExpiredError) {
-          res.send("Token Expired");
+          res.status(401).send(
+            JSON.stringify({
+              status: "failed",
+              data: "Token Expired",
+            })
+          );
         } else {
-          res.send("Invalid Token");
+          res.status(401).send(
+            JSON.stringify({
+              status: "failed",
+              data: "Invalid Token",
+            })
+          );
         }
       }
     } catch (err) {
       throw err;
     }
   }
-
-  /**async authorizationChecker(action: Action, roles: string[]) {
-    // here you can use request/response objects from action
-    // also if decorator defines roles it needs to access the action
-    // you can use them to provide granular access check
-    // checker must return either boolean (true or false)
-    // either promise that resolves a boolean value
-    // demo code:
-    console.log(action);
-    console.log('abacd');
-    const token = action.request.headers['authorization'];
-
-    //const user = await getEntityManager().findOneByToken(User, token);
-    //if (user && !roles.length) return true;
-   // if (user && roles.find(role => user.roles.indexOf(role) !== -1)) return true;
-
-    return false;
-  }**/
 }
